@@ -2,6 +2,8 @@ use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
 use bevy::time::Stopwatch;
 use bevy::window::{close_on_esc, PrimaryWindow};
+use bevy_pancam::{PanCam, PanCamPlugin};
+use rand::Rng;
 
 // Window
 const WINDOW_WIDTH: f32 = 1200.0;
@@ -14,6 +16,11 @@ const TILE_WIDTH: usize = 16;
 const TILE_HEIGHT: usize = 16;
 const SPRITE_SHEET_W: usize = 4;
 const SPRITE_SHEET_H: usize = 4;
+
+//World
+const NUM_WORLD_DECORATIONS: usize = 100;
+const WORLD_W: f32 = 3000.0;
+const WORLD_H: f32 = 250.0;
 
 //Colors
 const BG_COLOR: (u8, u8, u8) = (197, 204, 184);
@@ -37,18 +44,23 @@ enum GameState {
 //Resources
 #[derive(Resource)]
 struct GlobalTextureAtlasHandle(Option<Handle<TextureAtlasLayout>>);
+
 #[derive(Resource)]
 struct GlobalSpriteSheetHandle(Option<Handle<Image>>);
+
 #[derive(Resource)]
 struct CursorPosition(Option<Vec2>);
 
 //Components
 #[derive(Component)]
 struct Player;
+
 #[derive(Component)]
 struct Gun;
+
 #[derive(Component)]
 struct Bullet;
+
 #[derive(Component)]
 struct BulletDirection(Vec2);
 
@@ -76,7 +88,7 @@ fn load_assets(
 }
 
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default()).insert(PanCam::default());
 }
 
 fn init_world(
@@ -113,6 +125,42 @@ fn init_world(
     ));
 
     next_state.set(GameState::InGame);
+}
+
+fn spawn_world_decoration(
+    mut commands: Commands,
+    texture_atlas: Res<GlobalTextureAtlasHandle>,
+    image_handle: Res<GlobalSpriteSheetHandle>,
+) {
+    let mut rng = rand::thread_rng();
+    for _ in 0..NUM_WORLD_DECORATIONS {
+        let x = rng.gen_range(-WORLD_W..=WORLD_W);
+        let y = rng.gen_range(-WORLD_H..=WORLD_H);
+        commands.spawn((SpriteSheetBundle {
+            texture: image_handle.0.clone().unwrap(),
+            atlas: TextureAtlas {
+                layout: texture_atlas.0.clone().unwrap(),
+                index: rng.gen_range(12..=13),
+            },
+            transform: Transform::from_translation(vec3(x, y, 0.0))
+                .with_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
+            ..default()
+        },));
+    }
+}
+
+fn camera_follow_player(
+    player_query: Query<&Transform, With<Player>>,
+    mut camera_query: Query<&mut Transform, (With<Camera>, Without<Player>)>,
+) {
+    if camera_query.is_empty() || player_query.is_empty() {
+        return;
+    }
+
+    let player_transform = player_query.single();
+    let mut camera_transform = camera_query.single_mut();
+    let player_position = player_transform.translation;
+    camera_transform.translation = camera_transform.translation.lerp(player_position, 0.1);
 }
 
 fn handle_player_movement_input(
@@ -154,7 +202,7 @@ fn handle_player_movement_input(
         delta
     };
 
-    transform.translation += vec3(delta.x, delta.y, 0.0) * PLAYER_SPEED;
+    transform.translation += vec3(delta.x, delta.y, 0.1) * PLAYER_SPEED;
 }
 
 fn update_gun_transform(
@@ -189,6 +237,7 @@ fn update_gun_transform(
         0.0,
     );
 }
+
 fn update_cursor_position(
     mut cursor_position: ResMut<CursorPosition>,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -216,7 +265,7 @@ fn handle_player_fire_input(
     image_handle: Res<GlobalSpriteSheetHandle>,
     mouse_button_input: Res<ButtonInput<MouseButton>>,
 ) {
-    if  gun_query.is_empty() {
+    if gun_query.is_empty() {
         return;
     }
 
@@ -228,8 +277,8 @@ fn handle_player_fire_input(
     }
 
     let gun_position = gun_transform.translation.truncate();
-    let gun_direction = gun_transform.rotation * vec3(1.0,0.0,0.0);
-    
+    let gun_direction = gun_transform.rotation * vec3(1.0, 0.0, 0.0);
+
     if gun_stopwatch.0.elapsed_secs() >= BULLET_SPAWN_INTERVAL {
         commands.spawn((
             SpriteSheetBundle {
@@ -243,15 +292,13 @@ fn handle_player_fire_input(
                 ..default()
             },
             Bullet,
-            BulletDirection(gun_direction.truncate())
+            BulletDirection(gun_direction.truncate()),
         ));
         gun_stopwatch.0.reset();
     }
 }
 
-fn update_bullets(
-    mut bullet_query: Query<(&mut Transform, &mut BulletDirection)>) {
-    
+fn update_bullets(mut bullet_query: Query<(&mut Transform, &mut BulletDirection)>) {
     for (mut transform, bullet_direction) in &mut bullet_query {
         transform.translation += bullet_direction.0.normalize().extend(0.0) * BULLET_SPEED;
     }
@@ -273,6 +320,7 @@ fn main() {
                     ..default()
                 }),
         )
+        .add_plugins(PanCamPlugin::default())
         .insert_resource(Msaa::Off)
         .insert_resource(ClearColor(Color::rgb_u8(
             BG_COLOR.0, BG_COLOR.1, BG_COLOR.2,
@@ -281,7 +329,10 @@ fn main() {
         .insert_resource(GlobalTextureAtlasHandle(None))
         .insert_resource(GlobalSpriteSheetHandle(None))
         .add_systems(OnEnter(GameState::Loading), load_assets)
-        .add_systems(OnEnter(GameState::GameInit), (setup_camera, init_world))
+        .add_systems(
+            OnEnter(GameState::GameInit),
+            (setup_camera, (spawn_world_decoration, init_world).chain()),
+        )
         .add_systems(
             Update,
             (
@@ -290,6 +341,7 @@ fn main() {
                 update_gun_transform,
                 handle_player_fire_input,
                 update_bullets,
+                camera_follow_player,
             )
                 .run_if(in_state(GameState::InGame)),
         )

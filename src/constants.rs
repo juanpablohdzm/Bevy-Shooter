@@ -11,9 +11,9 @@ pub const SPRITE_SHEET_W: usize = 4;
 pub const SPRITE_SHEET_H: usize = 4;
 
 //World
-pub const NUM_WORLD_DECORATIONS: usize = 100;
+pub const NUM_WORLD_DECORATIONS: usize = 1000;
 pub const WORLD_W: f32 = 3000.0;
-pub const WORLD_H: f32 = 250.0;
+pub const WORLD_H: f32 = 3000.0;
 
 //Colors
 pub const BG_COLOR: (u8, u8, u8) = (197, 204, 184);

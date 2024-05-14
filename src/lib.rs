@@ -6,6 +6,7 @@ pub mod input;
 pub mod player;
 pub mod resources;
 pub mod states;
+pub mod world;
 
 pub use bullet::*;
 pub use constants::*;
@@ -15,3 +16,4 @@ pub use input::*;
 pub use player::*;
 pub use resources::*;
 pub use states::*;
+pub use world::*;

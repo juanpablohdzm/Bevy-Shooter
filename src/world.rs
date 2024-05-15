@@ -1,7 +1,7 @@
+use crate::{BulletRate, GameState, GlobalTextureAtlas, Gun, Player, SPRITE_SCALE_FACTOR};
 use bevy::prelude::*;
 use bevy::time::Stopwatch;
 use bevy_pancam::PanCam;
-use crate::{BulletRate, GameState, GlobalTextureAtlas, Gun, Player, SPRITE_SCALE_FACTOR};
 
 #[derive(Default)]
 pub struct WorldPlugin;
@@ -13,12 +13,10 @@ impl Plugin for WorldPlugin {
 }
 
 fn setup_camera(mut commands: Commands) {
-    commands
-        .spawn(Camera2dBundle::default())
-        .insert(PanCam{
-            grab_buttons: vec![],
-            ..default()
-        });
+    commands.spawn(Camera2dBundle::default()).insert(PanCam {
+        grab_buttons: vec![],
+        ..default()
+    });
 }
 
 fn init_world(

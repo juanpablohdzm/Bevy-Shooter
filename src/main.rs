@@ -1,7 +1,6 @@
 use bevy::prelude::*;
-use bevy::time::Stopwatch;
 use bevy::window::close_on_esc;
-use bevy_pancam::{PanCam, PanCamPlugin};
+use bevy_pancam::PanCamPlugin;
 use bevy_test::*;
 
 fn main() {
@@ -28,6 +27,7 @@ fn main() {
         .add_plugins(DecorationsPlugin)
         .add_plugins(InputPlugin)
         .add_plugins(WorldPlugin)
+        .add_plugins(EnemyPlugin)
         .add_systems(Update, close_on_esc)
         .run()
 }

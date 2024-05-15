@@ -19,8 +19,13 @@ pub const WORLD_H: f32 = 3000.0;
 pub const BG_COLOR: (u8, u8, u8) = (197, 204, 184);
 
 //Player
-pub const PLAYER_SPEED: f32 = 2.0;
+pub const PLAYER_SPEED: f32 = 10.0;
 
 //Gun
 pub const BULLET_SPAWN_INTERVAL: f32 = 0.05;
-pub const BULLET_SPEED: f32 = 10.0;
+pub const BULLET_SPEED: f32 = 15.0;
+
+//Enemies
+pub const MAX_ENEMY_AMOUNT: usize = 500;
+pub const ENEMY_SPAWN_RATE: f32 = 1.0;
+pub const ENEMY_SPEED: f32 = 3.0;

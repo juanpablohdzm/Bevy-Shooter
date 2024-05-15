@@ -70,6 +70,8 @@ fn camera_follow_player(
 
     let player_transform = player_query.single();
     let mut camera_transform = camera_query.single_mut();
-    let player_position = player_transform.translation;
-    camera_transform.translation = camera_transform.translation.lerp(player_position, 0.1);
+    let player_position = player_transform.translation.truncate();
+    camera_transform.translation = camera_transform
+        .translation
+        .lerp(player_position.extend(camera_transform.translation.z), 0.1);
 }

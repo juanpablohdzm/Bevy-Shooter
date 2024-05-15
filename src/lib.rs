@@ -1,6 +1,7 @@
 pub mod bullet;
 pub mod constants;
 pub mod decorations;
+pub mod enemy;
 pub mod gun;
 pub mod input;
 pub mod player;
@@ -11,6 +12,7 @@ pub mod world;
 pub use bullet::*;
 pub use constants::*;
 pub use decorations::*;
+pub use enemy::*;
 pub use gun::*;
 pub use input::*;
 pub use player::*;

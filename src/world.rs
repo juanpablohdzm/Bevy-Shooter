@@ -1,4 +1,4 @@
-use crate::{BulletRate, GameState, GlobalTextureAtlas, Gun, Player, SPRITE_SCALE_FACTOR};
+use crate::{AnimationTimer, BulletRate, GameState, GlobalTextureAtlas, Gun, Player, SPRITE_SCALE_FACTOR};
 use bevy::prelude::*;
 use bevy::time::Stopwatch;
 use bevy_pancam::PanCam;
@@ -34,6 +34,7 @@ fn init_world(
             transform: Transform::from_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
             ..default()
         },
+        AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
         Player,
     ));
 

@@ -22,6 +22,7 @@ fn main() {
         .add_plugins(PanCamPlugin)
         .add_plugins(ResourcesPlugin)
         .add_plugins(PlayerPlugin)
+        .add_plugins(bevy_test::AnimationPlugin)
         .add_plugins(GunPlugin)
         .add_plugins(BulletPlugin)
         .add_plugins(DecorationsPlugin)

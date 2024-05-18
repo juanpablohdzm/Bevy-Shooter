@@ -1,3 +1,4 @@
+pub mod animation;
 pub mod bullet;
 pub mod constants;
 pub mod decorations;
@@ -8,8 +9,8 @@ pub mod player;
 pub mod resources;
 pub mod states;
 pub mod world;
-pub mod animation;
 
+pub use animation::*;
 pub use bullet::*;
 pub use constants::*;
 pub use decorations::*;
@@ -20,4 +21,3 @@ pub use player::*;
 pub use resources::*;
 pub use states::*;
 pub use world::*;
-pub use animation::*;

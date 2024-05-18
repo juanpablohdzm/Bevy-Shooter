@@ -1,4 +1,6 @@
-use crate::{AnimationTimer, BulletRate, GameState, GlobalTextureAtlas, Gun, Player, SPRITE_SCALE_FACTOR};
+use crate::{
+    AnimationTimer, BulletRate, GameState, GlobalTextureAtlas, Gun, Player, SPRITE_SCALE_FACTOR,
+};
 use bevy::prelude::*;
 use bevy::time::Stopwatch;
 use bevy_pancam::PanCam;
